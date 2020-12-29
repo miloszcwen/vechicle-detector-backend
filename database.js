@@ -5,7 +5,7 @@ const database ={
             name: 'test',
             email: 'test@test.pl',
             password: 'test',
-            entries: 0,
+            carCounter: 0,
             joined: new Date(),
         },
         {
@@ -13,7 +13,7 @@ const database ={
             name: 'Miłosz',
             email: 'mil@sz.com',
             password: 'milosz',
-            entries: 0,
+            carCounter: 0,
             joined: new Date(),
         },
         {
@@ -21,7 +21,7 @@ const database ={
             name: 'Gosia',
             email: 'gosia@wp.pl',
             password: 'gosia',
-            entries: 0,
+            carCounter: 0,
             joined: new Date(),
         },
     ]
