@@ -31,6 +31,8 @@ app.post('/signin', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     let isValid = false;
+    // bcrypt.compareSync("B4c0/\/", hash); // true
+
     let user = {};
     // foreach not nessesary, DB will take care of it
     database.users.forEach((element)=>{
@@ -45,18 +47,32 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const {email, name, password} = req.body;
-        db('users')
-        .returning('*')
-        .insert({
-            email: email,
-            name: name,
-            joined: new Date()
+    const hash = bcrypt.hashSync(password);
+    db.transaction(trx=>{
+        trx.insert({
+            hash: hash,
+            email: email
         })
-        .then(user => {
-            res.json(user[0]);
+        .into('login')
+        .returning('email')
+        .then(loginEmail => {
+            return trx('users')
+            .returning('*')
+            .insert({
+                email: loginEmail[0],
+                name: name,
+                joined: new Date()
+            })
+            .then(user => {
+                res.json(user[0]);
+            })
         })
-        .catch(err => res.status(400).json('unable to register'));
+        .then(trx.commit)
+        .catch(trx.rollback)
+    })
+    .catch(err => res.status(400).json('unable to register'));
 })
+
 
 app.get('/profile/:id', (req, res) => {
     const id = req.params.id;
@@ -84,27 +100,6 @@ app.put('/image', (req, res)=>{
     .catch(err => res.status(400).json(err))
     })
 
-
-// ///
-// bcrypt.genSalt(10, function(err, salt) {
-//     bcrypt.hash("B4c0/\/", salt, function(err, hash) {
-//         // Store hash in your password DB.
-//     });
-// });
-
-// // Load hash from your password DB.
-// bcrypt.compare("B4c0/\/", hash, function(err, res) {
-//     // res === true
-// });
-// bcrypt.compare("not_bacon", hash, function(err, res) {
-//     // res === false
-// });
-
-// // As of bcryptjs 2.4.0, compare returns a promise if callback is omitted:
-// bcrypt.compare("B4c0/\/", hash).then((res) => {
-//     // res === true
-// });
-// ///
 
 app.listen(3000, ()=>{
     console.log('app is listening on port 3000');
