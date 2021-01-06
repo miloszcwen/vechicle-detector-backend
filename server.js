@@ -2,6 +2,20 @@ const express = require('express');
 const {database} = require('./database.js');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
+const knex = require('knex');
+const { response } = require('express');
+
+const db = knex({
+    client: 'pg',
+    connection: {
+      host : '127.0.0.1',
+      user : 'postgres',
+      password : 'postgres',
+      database : 'vechicle-detector'
+    }
+  });
+// show all
+ // db.select('*').from('users').then(data => {console.log(data);});
 
 const app = express();
 
@@ -31,52 +45,45 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const {email, name, password} = req.body;
-    try{
-        database.users.push({
-        id: '12345',
-        name: name,
-        email: email,
-        carCounter: 0,
-        joined: new Date(),
-    })
-    res.json(database.users[database.users.length-1]);
-    } catch(err) {
-        console.log("error",err);
-        res.status(400).json('error');
-    }
+        db('users')
+        .returning('*')
+        .insert({
+            email: email,
+            name: name,
+            joined: new Date()
+        })
+        .then(user => {
+            res.json(user[0]);
+        })
+        .catch(err => res.status(400).json('unable to register'));
 })
 
 app.get('/profile/:id', (req, res) => {
-    const userId = req.params.id;
-    let foundUser = false;
-    // change to filter!!
-    database.users.forEach(user => {
-        if (user.id === userId){
-            foundUser = true;
-            return res.json(user);
-        }
+    const id = req.params.id;
+    db.select('*').from('users').where({
+        id: id
     })
-    if (!foundUser) {
-        res.status(404).json('no such user');
-    }
-})
+    .then(user=>{
+        if (user.length){
+            res.json(user[0])
+        } else {
+            res.status(404).json('not found')
+        }
+        })
+        .catch(err => res.status(400).json(err));
+    })
 
 app.put('/image', (req, res)=>{
     const {id} = req.body;
-    let foundUser = false;
-    // change to filter!!
-    // extract to function
-    database.users.forEach(user => {
-        if (user.id === id){
-            foundUser = true;
-            user.carCounter++;
-            return res.json(user.carCounter);
-        }
+    db('users').where('id', '=', id)
+    .increment('carcount', 1)
+    .returning('carcount')
+    .then(carcount=>{
+        return res.json(carcount[0]);
     })
-    if (!foundUser) {
-        res.status(404).json('no such user');
-    }
-})
+    .catch(err => res.status(400).json(err))
+    })
+
 
 // ///
 // bcrypt.genSalt(10, function(err, salt) {
