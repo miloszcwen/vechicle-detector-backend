@@ -4,6 +4,9 @@ const cors = require('cors');
 const knex = require('knex');
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
+const profile = require('./controllers/profile');
+const image = require('./controllers/image');
+
 const { response } = require('express');
 
 const db = knex({
@@ -32,32 +35,11 @@ app.post('/signin', (req, res)=>{
 app.post('/register', (req, res)=>{
     register.handleRegister(req,res,db,bcrypt)})
 
-
 app.get('/profile/:id', (req, res) => {
-    const id = req.params.id;
-    db.select('*').from('users').where({
-        id: id
-    })
-    .then(user=>{
-        if (user.length){
-            res.json(user[0])
-        } else {
-            res.status(404).json('not found')
-        }
-        })
-        .catch(err => res.status(400).json(err));
-    })
+    profile.handleProfile(req, res, db)})
 
 app.put('/image', (req, res)=>{
-    const {id} = req.body;
-    db('users').where('id', '=', id)
-    .increment('carCounter', 1)
-    .returning('carCounter')
-    .then(carCounter=>{
-        return res.json(carCounter[0]);
-    })
-    .catch(err => res.status(400).json(err))
-    })
+    image.handleImage(req, res, db)})
 
 
 app.listen(3000, ()=>{
