@@ -26,11 +26,10 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/', (req, res) => {
-    res.send('success');
-})
+    res.send('success')})
 
-app.post('/signin', (req, res)=>{
-    signin.handleSignin(req, res, db, bcrypt)})
+app.post('/signin', signin.handleSignin(db, bcrypt))
+// compare to /register
 
 app.post('/register', (req, res)=>{
     register.handleRegister(req,res,db,bcrypt)})
