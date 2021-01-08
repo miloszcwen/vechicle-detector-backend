@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/', (req, res) => {
-    res.send('success')})
+    res.send('success!')})
 
 app.post('/signin', signin.handleSignin(db, bcrypt))
 // compare to /register
@@ -45,5 +45,5 @@ app.post('/imageurl', (req, res)=>{
 
 
 app.listen(process.env.PORT || 3000, ()=>{
-    console.log(`app is listening on port 3000${process.env.PORT}`);
+    console.log(`app is listening on port ${process.env.PORT}`);
 })
