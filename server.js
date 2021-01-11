@@ -9,10 +9,13 @@ const image = require('./controllers/image');
 
 const { response } = require('express');
 
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+
+
 const db = knex({
     client: 'pg',
     connection: {
-      host : '127.0.0.1',
+      host : 'postgresql-sinuous-70706',
       user : 'postgres',
       password : 'postgres',
       database : 'vechicle-detector'
