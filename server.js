@@ -16,10 +16,10 @@ const db = knex({
     client: 'pg',
     connection: {
       connectionString : process.env.DATABASE_URL,
-      ssl: true
-    //   ssl: {
-    //     rejectUnauthorized: false
-    //   }
+    //   ssl: true
+      ssl: {
+        rejectUnauthorized: false
+      }
     }
   });
 
@@ -27,7 +27,7 @@ const app = express();
 
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
-//app.use(cors());
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send('success!')})
