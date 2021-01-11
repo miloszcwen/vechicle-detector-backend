@@ -15,10 +15,8 @@ const { response } = require('express');
 const db = knex({
     client: 'pg',
     connection: {
-      host : 'postgresql-sinuous-70706',
-      user : 'postgres',
-      password : 'postgres',
-      database : 'vechicle-detector'
+      host : process.env.DATABASE_URL,
+      ssl: true
     }
   });
 
